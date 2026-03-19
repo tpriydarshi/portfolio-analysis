@@ -1,38 +1,54 @@
+# Portfolio X-Ray - Project Guide
 
-# Website Design Recreation
+## Overview
 
-## Workflow
+Full-stack app for analyzing Indian mutual fund portfolios. Users enter their MF holdings and allocation percentages; the app fetches underlying stock holdings and computes true stock-level exposure.
 
-When the user provides a reference image (screenshot) and optionally some CSS classes or style notes:
+## Tech Stack
 
-1. **Generate** a single `index.html` file using Tailwind CSS (via CDN). Include all content inline — no external files unless requested.
-2. **Screenshot** the rendered page using Puppeteer (`npx puppeteer screenshot index.html --fullpage` or equivalent). If the page has distinct sections, capture those individually too.
-3. **Compare** your screenshot against the reference image. Check for mismatches in:
-   - Spacing and padding (measure in px)
-   - Font sizes, weights, and line heights
-   - Colors (exact hex values)
-   - Alignment and positioning
-   - Border radii, shadows, and effects
-   - Responsive behavior
-   - Image/icon sizing and placement
-4. **Fix** every mismatch found. Edit the HTML/Tailwind code.
-5. **Re-screenshot** and compare again.
-6. **Repeat** steps 3–5 until the result is within ~2–3px of the reference everywhere.
+- **Framework**: Next.js 15 (App Router) + TypeScript
+- **Styling**: Tailwind CSS v4 + shadcn/ui (dark theme) + custom CSS vars
+- **Database & Auth**: Supabase (PostgreSQL + Auth + RLS)
+- **MF Scheme Search**: mfapi.in (free, no API key)
+- **MF Holdings Data**: RapidAPI "India Mutual Funds Portfolio Holding"
+- **Charts**: Recharts
+- **Validation**: Zod v4
+- **Package manager**: pnpm
 
-Do NOT stop after one pass. Always do at least 2 comparison rounds. Only stop when the user says so or when no visible differences remain.
+## Design System (Linear-inspired Dark UI)
 
-## Technical Defaults
+All UI follows a Linear-inspired dark aesthetic:
 
-- Use Tailwind CSS via CDN (`<script src="https://cdn.tailwindcss.com"></script>`)
-- Use placeholder images from `https://placehold.co/` when source images aren't provided
-- Mobile-first responsive design
-- Single `index.html` file unless the user requests otherwise
+- **Background**: `#000212` (deep dark blue-black)
+- **Card/Surface**: `#0f1011`
+- **Text Primary**: `#f7f8f8`
+- **Text Secondary**: `#b4bcd0`
+- **Text Tertiary**: `#8a8f98`
+- **Border**: `rgba(255, 255, 255, 0.08)` (normal), `rgba(255, 255, 255, 0.15)` (hover)
+- **Accent/Brand**: `#5e6ad2` (indigo), hover: `#6e7ae2`
+- **Destructive**: `#e5484d`
+- **Font**: Inter Variable (primary), monospace for numbers
+- **Radii**: 8px (inputs), 12px (cards), 16px (modals)
+- **Navbar**: 72px height, backdrop-blur, border-bottom
 
-## Rules
+## Project Conventions
 
-- Do not add features, sections, or content not present in the reference image
-- Match the reference exactly — do not "improve" the design
-- If the user provides CSS classes or style tokens, use them verbatim
-- Keep code clean but don't over-abstract — inline Tailwind classes are fine
-- When comparing screenshots, be specific about what's wrong (e.g., "heading is 32px but reference shows ~24px", "gap between cards is 16px but should be 24px")
-- 
+### File Organization
+- `src/app/` - Next.js App Router pages and API routes
+- `src/components/` - React components by domain (auth/, portfolio/, analysis/, layout/, ui/)
+- `src/lib/` - Utilities (supabase/, api/, aggregation/, validation/)
+- `src/types/` - TypeScript type definitions
+- `supabase/migrations/` - SQL migration files
+
+### Patterns
+- Server components by default; `"use client"` only when needed
+- Supabase server client for server components, browser client for client components
+- Admin client (service role) only in API routes for cache writes
+- RLS enforced on all user tables; cache tables readable by authenticated users
+- Zod for all input validation
+- Toast notifications via Sonner
+
+### Security
+- `RAPIDAPI_KEY` and `SUPABASE_SERVICE_ROLE_KEY` are server-only (no `NEXT_PUBLIC_` prefix)
+- Middleware handles session refresh and auth redirects
+- All protected routes under `(protected)/` route group
