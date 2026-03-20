@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import type { StockExposure } from "@/lib/aggregation/types";
 import {
   Table,
@@ -107,9 +107,8 @@ export function StockExposureTable({
         </TableHeader>
         <TableBody>
           {sorted.map((stock, i) => (
-            <>
+            <Fragment key={stock.isin}>
               <TableRow
-                key={stock.isin}
                 className="border-b border-[rgba(255,255,255,0.04)] hover:bg-[rgba(255,255,255,0.02)] cursor-pointer"
                 onClick={() =>
                   setExpandedRow(
@@ -194,7 +193,7 @@ export function StockExposureTable({
                   </TableCell>
                 </TableRow>
               )}
-            </>
+            </Fragment>
           ))}
         </TableBody>
       </Table>

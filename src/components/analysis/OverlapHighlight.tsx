@@ -58,9 +58,9 @@ export function OverlapHighlight({ overlaps }: OverlapHighlightProps) {
               </div>
             </div>
             <div className="space-y-1">
-              {overlap.funds.map((fund) => (
+              {overlap.funds.map((fund, idx) => (
                 <div
-                  key={fund.schemeName}
+                  key={`${fund.schemeName}-${idx}`}
                   className="flex items-center justify-between text-xs"
                 >
                   <span className="text-[#8a8f98] truncate max-w-[70%]">

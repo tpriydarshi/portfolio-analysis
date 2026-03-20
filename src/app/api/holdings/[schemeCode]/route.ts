@@ -52,6 +52,13 @@ export async function GET(
 
     if (holdings.length > 0) {
       const now = new Date().toISOString();
+
+      // Delete old cache before inserting to prevent duplicates
+      await admin
+        .from("holdings_cache")
+        .delete()
+        .eq("scheme_code", schemeCode);
+
       const rows = holdings.map((h) => ({
         scheme_code: schemeCode,
         stock_isin: h.stock_isin,

@@ -10,7 +10,7 @@ Full-stack app for analyzing Indian mutual fund portfolios. Users enter their MF
 - **Styling**: Tailwind CSS v4 + shadcn/ui (dark theme) + custom CSS vars
 - **Database & Auth**: Supabase (PostgreSQL + Auth + RLS)
 - **MF Scheme Search**: mfapi.in (free, no API key)
-- **MF Holdings Data**: RapidAPI "India Mutual Funds Portfolio Holding"
+- **MF Holdings Data**: AMFI official AMC portfolio Excel files (SEBI-mandated monthly disclosures)
 - **Charts**: Recharts
 - **Validation**: Zod v4
 - **Package manager**: pnpm
@@ -49,6 +49,6 @@ All UI follows a Linear-inspired dark aesthetic:
 - Toast notifications via Sonner
 
 ### Security
-- `RAPIDAPI_KEY` and `SUPABASE_SERVICE_ROLE_KEY` are server-only (no `NEXT_PUBLIC_` prefix)
+- `SUPABASE_SERVICE_ROLE_KEY` is server-only (no `NEXT_PUBLIC_` prefix)
 - Middleware handles session refresh and auth redirects
 - All protected routes under `(protected)/` route group

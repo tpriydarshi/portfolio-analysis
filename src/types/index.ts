@@ -6,3 +6,5 @@ export type {
   SchemeSearchCache,
   Database,
 } from "./database";
+
+export type { RawHolding } from "./holdings";

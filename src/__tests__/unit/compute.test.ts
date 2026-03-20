@@ -269,4 +269,74 @@ describe("computeAggregation", () => {
     // 15% of 20 lakh = 3 lakh
     expect(itSector?.amountInr).toBeCloseTo(300000, 0);
   });
+
+  it("handles a mix of funds with and without holdings data", () => {
+    // Regression: if one fund has no holdings (e.g., unsupported AMC),
+    // the analysis should still work for the remaining funds
+    const result = computeAggregation(
+      [
+        {
+          fund: makeFund({ id: "f1", scheme_code: 100, scheme_name: "Fund A", allocation_pct: 60 }),
+          holdings: [
+            makeHolding({ scheme_code: 100, stock_isin: "INE001", stock_name: "Stock A", holding_pct: 10 }),
+          ],
+        },
+        {
+          fund: makeFund({ id: "f2", scheme_code: 200, scheme_name: "Fund B (no data)", allocation_pct: 40 }),
+          holdings: [], // empty — no data available
+        },
+      ],
+      1000000
+    );
+
+    expect(result.totalStocks).toBe(1);
+    expect(result.stocks[0].exposurePct).toBeCloseTo(6, 2); // 60% * 10%
+    expect(result.stocks[0].amountInr).toBeCloseTo(60000, 0);
+  });
+
+  it("does not produce duplicate stock entries when same stock appears multiple times in a single fund", () => {
+    // Regression: duplicate rows in holdings_cache should be aggregated, not duplicated
+    const result = computeAggregation(
+      [
+        {
+          fund: makeFund({ allocation_pct: 100 }),
+          holdings: [
+            makeHolding({ stock_isin: "INE001", stock_name: "HDFC Bank", holding_pct: 5 }),
+            makeHolding({ stock_isin: "INE001", stock_name: "HDFC Bank", holding_pct: 5 }),
+          ],
+        },
+      ],
+      null
+    );
+
+    // Both entries are for the same ISIN so they get merged into one stock
+    expect(result.totalStocks).toBe(1);
+    // Exposure is additive: 100% * 5% + 100% * 5% = 10%
+    expect(result.stocks[0].exposurePct).toBeCloseTo(10, 2);
+    // But contributingFunds will have 2 entries (same fund contributing twice)
+    expect(result.stocks[0].contributingFunds).toHaveLength(2);
+  });
+
+  it("overlap funds list contains unique scheme names", () => {
+    // Regression: overlap.funds should not contain duplicate scheme names
+    const result = computeAggregation(
+      [
+        {
+          fund: makeFund({ id: "f1", scheme_code: 100, scheme_name: "Fund A", allocation_pct: 50 }),
+          holdings: [makeHolding({ scheme_code: 100, stock_isin: "SHARED", holding_pct: 10 })],
+        },
+        {
+          fund: makeFund({ id: "f2", scheme_code: 200, scheme_name: "Fund B", allocation_pct: 50 }),
+          holdings: [makeHolding({ scheme_code: 200, stock_isin: "SHARED", holding_pct: 8 })],
+        },
+      ],
+      null
+    );
+
+    expect(result.fundOverlaps).toHaveLength(1);
+    const overlap = result.fundOverlaps[0];
+    const schemeNames = overlap.funds.map((f) => f.schemeName);
+    // No duplicates in the funds list
+    expect(new Set(schemeNames).size).toBe(schemeNames.length);
+  });
 });

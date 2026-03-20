@@ -66,7 +66,7 @@ export async function POST(
           return { fund, holdings: cached };
         }
 
-        // Fetch from API (with fallback to sample data)
+        // Fetch from AMFI on-demand
         const { fetchHoldingsWithFallback } = await import(
           "@/lib/api/holdings-provider"
         );
@@ -74,6 +74,13 @@ export async function POST(
 
         if (rawHoldings.length > 0) {
           const now = new Date().toISOString();
+
+          // Delete old cache before inserting to prevent duplicates
+          await admin
+            .from("holdings_cache")
+            .delete()
+            .eq("scheme_code", fund.scheme_code);
+
           const rows = rawHoldings.map((h) => ({
             scheme_code: fund.scheme_code,
             stock_isin: h.stock_isin,
