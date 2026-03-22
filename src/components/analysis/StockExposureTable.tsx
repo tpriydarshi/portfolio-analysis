@@ -10,7 +10,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
 import { ArrowUpDown, ChevronDown, ChevronRight } from "lucide-react";
 
 interface StockExposureTableProps {
@@ -56,13 +55,13 @@ export function StockExposureTable({
   }
 
   return (
-    <div className="bg-[#0f1011] border border-[rgba(255,255,255,0.08)] rounded-xl overflow-hidden">
+    <div className="bg-[#131313] rounded-md overflow-hidden">
       <Table>
         <TableHeader>
-          <TableRow className="border-b border-[rgba(255,255,255,0.08)] hover:bg-transparent">
-            <TableHead className="text-[#8a8f98] w-8">#</TableHead>
+          <TableRow className="hover:bg-transparent">
+            <TableHead className="w-8">#</TableHead>
             <TableHead
-              className="text-[#8a8f98] cursor-pointer hover:text-[#b4bcd0]"
+              className="cursor-pointer hover:text-[#acabaa]"
               onClick={() => toggleSort("name")}
             >
               <span className="flex items-center gap-1">
@@ -70,7 +69,7 @@ export function StockExposureTable({
               </span>
             </TableHead>
             <TableHead
-              className="text-[#8a8f98] cursor-pointer hover:text-[#b4bcd0] text-right"
+              className="cursor-pointer hover:text-[#acabaa] text-right"
               onClick={() => toggleSort("exposurePct")}
             >
               <span className="flex items-center gap-1 justify-end">
@@ -79,7 +78,7 @@ export function StockExposureTable({
             </TableHead>
             {showAmounts && (
               <TableHead
-                className="text-[#8a8f98] cursor-pointer hover:text-[#b4bcd0] text-right"
+                className="cursor-pointer hover:text-[#acabaa] text-right"
                 onClick={() => toggleSort("amountInr")}
               >
                 <span className="flex items-center gap-1 justify-end">
@@ -88,7 +87,7 @@ export function StockExposureTable({
               </TableHead>
             )}
             <TableHead
-              className="text-[#8a8f98] cursor-pointer hover:text-[#b4bcd0]"
+              className="cursor-pointer hover:text-[#acabaa]"
               onClick={() => toggleSort("sector")}
             >
               <span className="flex items-center gap-1">
@@ -96,7 +95,7 @@ export function StockExposureTable({
               </span>
             </TableHead>
             <TableHead
-              className="text-[#8a8f98] cursor-pointer hover:text-[#b4bcd0] text-right"
+              className="cursor-pointer hover:text-[#acabaa] text-right"
               onClick={() => toggleSort("fundCount")}
             >
               <span className="flex items-center gap-1 justify-end">
@@ -109,67 +108,63 @@ export function StockExposureTable({
           {sorted.map((stock, i) => (
             <Fragment key={stock.isin}>
               <TableRow
-                className="border-b border-[rgba(255,255,255,0.04)] hover:bg-[rgba(255,255,255,0.02)] cursor-pointer"
+                className="cursor-pointer"
                 onClick={() =>
                   setExpandedRow(
                     expandedRow === stock.isin ? null : stock.isin
                   )
                 }
               >
-                <TableCell className="text-[#8a8f98] text-xs font-mono">
+                <TableCell className="text-[#767575] text-xs font-mono">
                   {i + 1}
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2">
                     {expandedRow === stock.isin ? (
-                      <ChevronDown className="h-3 w-3 text-[#8a8f98] shrink-0" />
+                      <ChevronDown className="h-3 w-3 text-[#767575] shrink-0" />
                     ) : (
-                      <ChevronRight className="h-3 w-3 text-[#8a8f98] shrink-0" />
+                      <ChevronRight className="h-3 w-3 text-[#767575] shrink-0" />
                     )}
-                    <span className="text-sm text-[#f7f8f8]">
+                    <span className="text-sm text-[#e7e5e5]">
                       {stock.name}
                     </span>
                   </div>
                 </TableCell>
-                <TableCell className="text-right font-mono text-sm text-[#f7f8f8]">
+                <TableCell className="text-right font-mono text-sm text-[#e7e5e5]">
                   {stock.exposurePct.toFixed(2)}%
                 </TableCell>
                 {showAmounts && (
-                  <TableCell className="text-right font-mono text-sm text-[#b4bcd0]">
+                  <TableCell className="text-right font-mono text-sm text-[#acabaa]">
                     {stock.amountInr
                       ? formatINR(stock.amountInr)
                       : "-"}
                   </TableCell>
                 )}
                 <TableCell>
-                  <Badge
-                    variant="secondary"
-                    className="bg-[rgba(255,255,255,0.04)] text-[#8a8f98] text-xs font-normal"
-                  >
+                  <span className="text-xs text-[#9f9da1]">
                     {stock.sector || "Other"}
-                  </Badge>
+                  </span>
                 </TableCell>
                 <TableCell className="text-right">
-                  <Badge
-                    variant="secondary"
-                    className={`text-xs font-mono ${
+                  <span
+                    className={`text-xs font-mono px-2 py-0.5 rounded-sm ${
                       stock.contributingFunds.length >= 2
-                        ? "bg-[#5e6ad2]/10 text-[#5e6ad2]"
-                        : "bg-[rgba(255,255,255,0.04)] text-[#8a8f98]"
+                        ? "bg-[#2f3f92]/20 text-[#bac3ff]"
+                        : "text-[#767575]"
                     }`}
                   >
                     {stock.contributingFunds.length}
-                  </Badge>
+                  </span>
                 </TableCell>
               </TableRow>
               {expandedRow === stock.isin && (
                 <TableRow
                   key={`${stock.isin}-detail`}
-                  className="border-b border-[rgba(255,255,255,0.04)]"
+                  className="hover:bg-transparent"
                 >
                   <TableCell colSpan={showAmounts ? 6 : 5} className="py-0">
-                    <div className="py-3 px-6 space-y-1.5">
-                      <p className="text-xs text-[#8a8f98] font-medium mb-2">
+                    <div className="py-3 px-6 space-y-1.5 bg-[#0e0e0e] rounded-sm mx-2 mb-2">
+                      <p className="text-xs text-[#9f9da1] font-medium uppercase tracking-wider mb-2">
                         Contributing Funds:
                       </p>
                       {stock.contributingFunds.map((f) => (
@@ -177,13 +172,13 @@ export function StockExposureTable({
                           key={f.schemeCode}
                           className="flex items-center justify-between text-xs"
                         >
-                          <span className="text-[#b4bcd0]">
+                          <span className="text-[#acabaa]">
                             {f.schemeName}
                           </span>
-                          <span className="font-mono text-[#8a8f98]">
+                          <span className="font-mono text-[#767575]">
                             {f.fundAllocationPct.toFixed(1)}% alloc x{" "}
                             {f.stockInFundPct.toFixed(2)}% holding ={" "}
-                            <span className="text-[#5e6ad2]">
+                            <span className="text-[#4ade80]">
                               {f.weightedContribution.toFixed(2)}%
                             </span>
                           </span>

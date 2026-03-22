@@ -4,21 +4,14 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* Inter Variable from Google Fonts */
-@font-face {
-  font-family: "Inter Variable";
-  font-style: normal;
-  font-weight: 100 900;
-  font-display: swap;
-  src: url("https://fonts.gstatic.com/s/inter/v21/UcCo3FwrK3iLTcviYwY.woff2") format("woff2");
-}
+/* Fonts loaded via next/font/google in layout.tsx */
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: "Inter Variable", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-inter), "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "Berkeley Mono", "JetBrains Mono", ui-monospace, monospace;
-  --font-heading: "Inter Variable", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-heading: var(--font-newsreader), "Newsreader", "Georgia", serif;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -56,53 +49,69 @@
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
 
-  /* Linear-inspired custom colors */
-  --color-linear-bg: #000212;
-  --color-linear-card: #0f1011;
-  --color-linear-card-hover: #141516;
-  --color-linear-border: rgba(255, 255, 255, 0.08);
-  --color-linear-border-hover: rgba(255, 255, 255, 0.15);
-  --color-linear-text: #f7f8f8;
-  --color-linear-text-secondary: #b4bcd0;
-  --color-linear-text-tertiary: #8a8f98;
-  --color-linear-accent: #5e6ad2;
-  --color-linear-accent-hover: #6e7ae2;
-  --color-linear-accent-subtle: rgba(94, 106, 210, 0.15);
+  /* Equity Noir 2 — Surface hierarchy */
+  --color-surface-lowest: #000000;
+  --color-surface: #0e0e0e;
+  --color-surface-container: #191a1a;
+  --color-surface-container-low: #131313;
+  --color-surface-container-high: #1f2020;
+  --color-surface-container-highest: #252626;
+  --color-surface-bright: #2b2c2c;
+
+  /* Equity Noir 2 — Semantic tokens */
+  --color-en-primary: #bac3ff;
+  --color-en-primary-dim: #a8b4ff;
+  --color-en-primary-container: #2f3f92;
+  --color-en-on-primary-container: #c7cdff;
+  --color-en-secondary: #9f9da1;
+  --color-en-tertiary: #e4ebff;
+  --color-en-error: #ec7c8a;
+  --color-en-outline: #767575;
+  --color-en-outline-variant: #484848;
+  --color-en-on-surface: #e7e5e5;
+  --color-en-on-surface-variant: #acabaa;
+  --color-en-inverse-surface: #fcf9f8;
+  --color-en-inverse-on-surface: #565555;
+
+  /* Equity Noir 2 — Warm accent (CTA) */
+  --color-en-cta: #4ade80;
+  --color-en-cta-hover: #22c55e;
+  --color-en-cta-muted: rgba(74, 222, 128, 0.15);
 }
 
 :root {
-  --background: #000212;
-  --foreground: #f7f8f8;
-  --card: #0f1011;
-  --card-foreground: #f7f8f8;
-  --popover: #0f1011;
-  --popover-foreground: #f7f8f8;
-  --primary: #5e6ad2;
-  --primary-foreground: #ffffff;
-  --secondary: #1a1b1e;
-  --secondary-foreground: #f7f8f8;
-  --muted: #1a1b1e;
-  --muted-foreground: #8a8f98;
-  --accent: #1a1b1e;
-  --accent-foreground: #f7f8f8;
-  --destructive: #e5484d;
-  --border: rgba(255, 255, 255, 0.08);
-  --input: rgba(255, 255, 255, 0.08);
-  --ring: #5e6ad2;
-  --chart-1: #5e6ad2;
-  --chart-2: #8b5cf6;
-  --chart-3: #06b6d4;
-  --chart-4: #10b981;
-  --chart-5: #f59e0b;
-  --radius: 0.625rem;
-  --sidebar: #0f1011;
-  --sidebar-foreground: #f7f8f8;
-  --sidebar-primary: #5e6ad2;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #1a1b1e;
-  --sidebar-accent-foreground: #f7f8f8;
-  --sidebar-border: rgba(255, 255, 255, 0.08);
-  --sidebar-ring: #5e6ad2;
+  --background: #0e0e0e;
+  --foreground: #e7e5e5;
+  --card: #191a1a;
+  --card-foreground: #e7e5e5;
+  --popover: #191a1a;
+  --popover-foreground: #e7e5e5;
+  --primary: #bac3ff;
+  --primary-foreground: #28388b;
+  --secondary: #252626;
+  --secondary-foreground: #e7e5e5;
+  --muted: #1f2020;
+  --muted-foreground: #9f9da1;
+  --accent: #1f2020;
+  --accent-foreground: #e7e5e5;
+  --destructive: #ec7c8a;
+  --border: rgba(72, 72, 72, 0.2);
+  --input: rgba(72, 72, 72, 0.2);
+  --ring: #bac3ff;
+  --chart-1: #4ade80;
+  --chart-2: #facc15;
+  --chart-3: #bac3ff;
+  --chart-4: #ec7c8a;
+  --chart-5: #a8b4ff;
+  --radius: 0.375rem;
+  --sidebar: #191a1a;
+  --sidebar-foreground: #e7e5e5;
+  --sidebar-primary: #bac3ff;
+  --sidebar-primary-foreground: #28388b;
+  --sidebar-accent: #1f2020;
+  --sidebar-accent-foreground: #e7e5e5;
+  --sidebar-border: rgba(72, 72, 72, 0.2);
+  --sidebar-ring: #bac3ff;
 }
 
 @layer base {
@@ -126,9 +135,9 @@
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(118, 117, 117, 0.3);
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(118, 117, 117, 0.5);
 }

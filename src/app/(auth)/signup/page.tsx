@@ -7,10 +7,10 @@ export const metadata = {
 export default function SignupPage() {
   return (
     <div>
-      <h2 className="text-lg font-semibold text-[#f7f8f8] mb-1">
+      <h2 className="text-lg font-semibold text-[#e7e5e5] mb-1">
         Create your account
       </h2>
-      <p className="text-sm text-[#8a8f98] mb-6">
+      <p className="text-sm text-[#9f9da1] mb-6">
         Start analyzing your mutual fund portfolio
       </p>
       <SignupForm />

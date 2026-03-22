@@ -2,29 +2,39 @@
 
 import Link from "next/link";
 import type { Portfolio } from "@/types/database";
-import { BarChart3, Clock, Plus } from "lucide-react";
+import { BarChart3, Plus } from "lucide-react";
 
 export function PortfolioCard({ portfolio }: { portfolio: Portfolio }) {
   return (
     <Link href={`/portfolio/${portfolio.id}`}>
-      <div className="group bg-[#0f1011] border border-[rgba(255,255,255,0.08)] rounded-xl p-5 hover:border-[rgba(255,255,255,0.15)] hover:shadow-lg hover:shadow-[#5e6ad2]/5 transition-all duration-200">
-        <div className="flex items-start justify-between mb-3">
-          <div className="h-9 w-9 rounded-lg bg-[#5e6ad2]/10 flex items-center justify-center">
-            <BarChart3 className="h-4 w-4 text-[#5e6ad2]" />
+      <div className="grid grid-cols-[2fr_1fr_1fr_1fr] gap-4 px-5 py-4 hover:bg-[#1f2020] transition-colors cursor-pointer items-center">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="h-8 w-8 rounded-md bg-[#2f3f92]/20 flex items-center justify-center shrink-0">
+            <BarChart3 className="h-4 w-4 text-[#bac3ff]" />
           </div>
-          {portfolio.total_value_inr && (
-            <span className="text-xs font-mono text-[#8a8f98]">
-              {formatINR(portfolio.total_value_inr)}
-            </span>
-          )}
+          <span className="text-sm text-[#e7e5e5] font-medium truncate">
+            {portfolio.name}
+          </span>
         </div>
-        <h3 className="text-[#f7f8f8] font-medium text-sm mb-1 group-hover:text-white transition-colors">
-          {portfolio.name}
-        </h3>
-        <div className="flex items-center gap-1.5 text-xs text-[#8a8f98]">
-          <Clock className="h-3 w-3" />
-          <span>
-            Updated {new Date(portfolio.updated_at).toLocaleDateString("en-IN")}
+        <div className="text-right">
+          <span className="text-sm font-mono text-[#e7e5e5]">
+            {portfolio.total_value_inr
+              ? formatINR(portfolio.total_value_inr)
+              : "—"}
+          </span>
+        </div>
+        <div className="text-center">
+          <span className="inline-flex items-center px-2 py-0.5 rounded-sm text-xs font-medium bg-[#4ade80]/10 text-[#4ade80]">
+            Active
+          </span>
+        </div>
+        <div className="text-right">
+          <span className="text-xs text-[#9f9da1]">
+            {new Date(portfolio.updated_at).toLocaleDateString("en-IN", {
+              day: "numeric",
+              month: "short",
+              year: "numeric",
+            })}
           </span>
         </div>
       </div>
@@ -35,11 +45,11 @@ export function PortfolioCard({ portfolio }: { portfolio: Portfolio }) {
 export function NewPortfolioCard() {
   return (
     <Link href="/portfolio/new">
-      <div className="group border border-dashed border-[rgba(255,255,255,0.08)] rounded-xl p-5 hover:border-[#5e6ad2]/40 transition-all duration-200 flex flex-col items-center justify-center min-h-[140px] gap-2">
-        <div className="h-9 w-9 rounded-lg bg-[#5e6ad2]/10 flex items-center justify-center group-hover:bg-[#5e6ad2]/20 transition-colors">
-          <Plus className="h-4 w-4 text-[#5e6ad2]" />
+      <div className="group bg-[#131313] rounded-md p-5 hover:bg-[#1f2020] transition-all duration-200 flex items-center gap-3 cursor-pointer">
+        <div className="h-9 w-9 rounded-md bg-[#4ade80]/10 flex items-center justify-center group-hover:bg-[#4ade80]/20 transition-colors">
+          <Plus className="h-4 w-4 text-[#4ade80]" />
         </div>
-        <span className="text-sm text-[#8a8f98] group-hover:text-[#b4bcd0] transition-colors">
+        <span className="text-sm text-[#9f9da1] group-hover:text-[#acabaa] transition-colors font-medium">
           New Portfolio
         </span>
       </div>
@@ -48,7 +58,7 @@ export function NewPortfolioCard() {
 }
 
 function formatINR(value: number): string {
-  if (value >= 1e7) return `${(value / 1e7).toFixed(1)} Cr`;
-  if (value >= 1e5) return `${(value / 1e5).toFixed(1)} L`;
-  return `${value.toLocaleString("en-IN")}`;
+  if (value >= 1e7) return `\u20B9${(value / 1e7).toFixed(1)} Cr`;
+  if (value >= 1e5) return `\u20B9${(value / 1e5).toFixed(1)} L`;
+  return `\u20B9${value.toLocaleString("en-IN")}`;
 }

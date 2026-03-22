@@ -5,7 +5,6 @@ import {
   Bar,
   XAxis,
   YAxis,
-  CartesianGrid,
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
@@ -24,21 +23,16 @@ export function SectorBarChart({ sectors }: SectorBarChartProps) {
   }));
 
   return (
-    <div className="bg-[#0f1011] border border-[rgba(255,255,255,0.08)] rounded-xl p-5">
-      <h3 className="text-sm font-medium text-[#b4bcd0] mb-4">
+    <div className="bg-[#131313] rounded-md p-5">
+      <h3 className="text-xs text-[#9f9da1] uppercase tracking-wider font-medium mb-4">
         Sector Allocation
       </h3>
       <div className="h-[350px]">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={data} layout="vertical" margin={{ left: 80 }}>
-            <CartesianGrid
-              strokeDasharray="3 3"
-              stroke="rgba(255,255,255,0.04)"
-              horizontal={false}
-            />
             <XAxis
               type="number"
-              tick={{ fill: "#8a8f98", fontSize: 11 }}
+              tick={{ fill: "#767575", fontSize: 11 }}
               tickFormatter={(v) => `${v}%`}
               axisLine={false}
               tickLine={false}
@@ -46,7 +40,7 @@ export function SectorBarChart({ sectors }: SectorBarChartProps) {
             <YAxis
               type="category"
               dataKey="name"
-              tick={{ fill: "#8a8f98", fontSize: 11 }}
+              tick={{ fill: "#9f9da1", fontSize: 11 }}
               axisLine={false}
               tickLine={false}
               width={80}
@@ -56,9 +50,9 @@ export function SectorBarChart({ sectors }: SectorBarChartProps) {
                 if (!active || !payload?.length) return null;
                 const d = payload[0].payload;
                 return (
-                  <div className="bg-[#1a1b1e] border border-[rgba(255,255,255,0.08)] rounded-lg px-3 py-2 shadow-xl">
-                    <p className="text-xs text-[#f7f8f8]">{d.fullName}</p>
-                    <p className="text-xs font-mono text-[#5e6ad2]">
+                  <div className="bg-[#252626] rounded-md px-3 py-2 shadow-[0_20px_40px_rgba(0,0,0,0.4)]">
+                    <p className="text-xs text-[#e7e5e5]">{d.fullName}</p>
+                    <p className="text-xs font-mono text-[#4ade80]">
                       {d.exposure}% ({d.stocks} stocks)
                     </p>
                   </div>
@@ -67,7 +61,7 @@ export function SectorBarChart({ sectors }: SectorBarChartProps) {
             />
             <Bar
               dataKey="exposure"
-              fill="#5e6ad2"
+              fill="#4ade80"
               radius={[0, 4, 4, 0]}
               barSize={16}
             />

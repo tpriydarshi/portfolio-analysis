@@ -39,7 +39,7 @@ export function LoginForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="email" className="text-[#b4bcd0] text-sm">
+        <Label htmlFor="email" className="text-[#acabaa] text-sm">
           Email
         </Label>
         <Input
@@ -49,11 +49,11 @@ export function LoginForm() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          className="bg-[#0a0a0b] border-[rgba(255,255,255,0.08)] text-[#f7f8f8] placeholder:text-[#8a8f98] focus:border-[#5e6ad2] focus:ring-[#5e6ad2]/20"
+          className="bg-[#000000] border-none text-[#e7e5e5] placeholder:text-[#767575] focus:ring-1 focus:ring-[#bac3ff]/40"
         />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="password" className="text-[#b4bcd0] text-sm">
+        <Label htmlFor="password" className="text-[#acabaa] text-sm">
           Password
         </Label>
         <Input
@@ -63,22 +63,22 @@ export function LoginForm() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
-          className="bg-[#0a0a0b] border-[rgba(255,255,255,0.08)] text-[#f7f8f8] placeholder:text-[#8a8f98] focus:border-[#5e6ad2] focus:ring-[#5e6ad2]/20"
+          className="bg-[#000000] border-none text-[#e7e5e5] placeholder:text-[#767575] focus:ring-1 focus:ring-[#bac3ff]/40"
         />
       </div>
       {error && (
-        <p className="text-sm text-[#e5484d]">{error}</p>
+        <p className="text-sm text-[#ec7c8a]">{error}</p>
       )}
       <Button
         type="submit"
         disabled={loading}
-        className="w-full bg-[#5e6ad2] hover:bg-[#6e7ae2] text-white font-medium"
+        className="w-full bg-gradient-to-r from-[#2f3f92] to-[#4555a8] hover:from-[#3a4da0] hover:to-[#5060b5] text-[#c7cdff] font-medium rounded-md"
       >
         {loading ? "Signing in..." : "Sign in"}
       </Button>
-      <p className="text-center text-sm text-[#8a8f98]">
+      <p className="text-center text-sm text-[#9f9da1]">
         Don&apos;t have an account?{" "}
-        <Link href="/signup" className="text-[#5e6ad2] hover:text-[#6e7ae2]">
+        <Link href="/signup" className="text-[#bac3ff] hover:text-[#c7cdff]">
           Sign up
         </Link>
       </p>

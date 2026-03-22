@@ -30,8 +30,8 @@ export function FundAllocationList({
 
   if (funds.length === 0) {
     return (
-      <div className="border border-dashed border-[rgba(255,255,255,0.08)] rounded-lg p-6 text-center">
-        <p className="text-sm text-[#8a8f98]">
+      <div className="bg-[#000000] rounded-md p-6 text-center">
+        <p className="text-sm text-[#767575]">
           Search and add mutual funds above
         </p>
       </div>
@@ -39,15 +39,15 @@ export function FundAllocationList({
   }
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-2">
       {funds.map((fund, index) => (
         <div
           key={fund.schemeCode}
-          className="bg-[#0a0a0b] border border-[rgba(255,255,255,0.08)] rounded-lg p-3 flex items-center gap-3"
+          className="bg-[#000000] rounded-md p-3 flex items-center gap-3"
         >
           <div className="flex-1 min-w-0">
-            <p className="text-sm text-[#f7f8f8] truncate">{fund.schemeName}</p>
-            <p className="text-xs text-[#8a8f98]">Code: {fund.schemeCode}</p>
+            <p className="text-sm text-[#e7e5e5] truncate">{fund.schemeName}</p>
+            <p className="text-xs text-[#767575]">Code: {fund.schemeCode}</p>
           </div>
           <div className="flex items-center gap-2 shrink-0">
             <Input
@@ -57,15 +57,15 @@ export function FundAllocationList({
               max="100"
               value={fund.allocationPct || ""}
               onChange={(e) => updateAllocation(index, e.target.value)}
-              className="w-20 text-right bg-transparent border-[rgba(255,255,255,0.08)] text-[#f7f8f8] font-mono text-sm"
+              className="w-20 text-right bg-transparent border-none text-[#e7e5e5] font-mono text-sm focus:ring-1 focus:ring-[#bac3ff]/40"
             />
-            <span className="text-xs text-[#8a8f98]">%</span>
+            <span className="text-xs text-[#767575]">%</span>
             <Button
               type="button"
               variant="ghost"
               size="sm"
               onClick={() => removeFund(index)}
-              className="h-7 w-7 p-0 text-[#8a8f98] hover:text-[#e5484d]"
+              className="h-7 w-7 p-0 text-[#767575] hover:text-[#ec7c8a]"
             >
               <X className="h-3.5 w-3.5" />
             </Button>
@@ -74,18 +74,18 @@ export function FundAllocationList({
       ))}
 
       {/* Total bar */}
-      <div className="flex items-center justify-between px-3 py-2 bg-[#0a0a0b] rounded-lg border border-[rgba(255,255,255,0.08)]">
-        <span className="text-sm text-[#b4bcd0]">Total Allocation</span>
+      <div className="flex items-center justify-between px-3 py-2 bg-[#000000] rounded-md">
+        <span className="text-sm text-[#acabaa]">Total Allocation</span>
         <div className="flex items-center gap-2">
           <span
             className={`font-mono text-sm font-medium ${
-              isValid ? "text-emerald-400" : "text-amber-400"
+              isValid ? "text-[#4ade80]" : "text-[#facc15]"
             }`}
           >
             {totalPct.toFixed(2)}%
           </span>
           {!isValid && (
-            <span className="text-xs text-amber-400">Must equal 100%</span>
+            <span className="text-xs text-[#facc15]">Must equal 100%</span>
           )}
         </div>
       </div>

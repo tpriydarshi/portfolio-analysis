@@ -45,7 +45,7 @@ export function DeletePortfolioButton({
       size="sm"
       onClick={handleDelete}
       disabled={deleting}
-      className="text-[#8a8f98] hover:text-[#e5484d] hover:bg-[#e5484d]/10"
+      className="text-[#9f9da1] hover:text-[#ec7c8a] hover:bg-[#ec7c8a]/10"
     >
       {deleting ? (
         <Loader2 className="h-4 w-4 animate-spin" />

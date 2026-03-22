@@ -139,9 +139,9 @@ export function PortfolioForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-5">
       <div className="space-y-2">
-        <Label htmlFor="name" className="text-[#b4bcd0] text-sm">
+        <Label htmlFor="name" className="text-[#acabaa] text-sm">
           Portfolio Name
         </Label>
         <Input
@@ -151,14 +151,14 @@ export function PortfolioForm({
           placeholder="My Investment Portfolio"
           required
           maxLength={100}
-          className="bg-[#0a0a0b] border-[rgba(255,255,255,0.08)] text-[#f7f8f8] placeholder:text-[#8a8f98] focus:border-[#5e6ad2]"
+          className="bg-[#000000] border-none text-[#e7e5e5] placeholder:text-[#767575] focus:ring-1 focus:ring-[#bac3ff]/40"
         />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="totalValue" className="text-[#b4bcd0] text-sm">
+        <Label htmlFor="totalValue" className="text-[#acabaa] text-sm">
           Total Portfolio Value (INR){" "}
-          <span className="text-[#8a8f98]">- optional</span>
+          <span className="text-[#767575]">- optional</span>
         </Label>
         <Input
           id="totalValue"
@@ -167,12 +167,12 @@ export function PortfolioForm({
           onChange={(e) => setTotalValue(e.target.value)}
           placeholder="e.g. 1000000"
           min={0}
-          className="bg-[#0a0a0b] border-[rgba(255,255,255,0.08)] text-[#f7f8f8] placeholder:text-[#8a8f98] focus:border-[#5e6ad2] font-mono"
+          className="bg-[#000000] border-none text-[#e7e5e5] placeholder:text-[#767575] focus:ring-1 focus:ring-[#bac3ff]/40 font-mono"
         />
       </div>
 
       <div className="space-y-3">
-        <Label className="text-[#b4bcd0] text-sm">Mutual Funds</Label>
+        <Label className="text-[#acabaa] text-sm">Mutual Funds</Label>
         <FundSearchCombobox onSelect={handleAddFund} />
         <FundAllocationList funds={funds} onChange={setFunds} />
       </div>
@@ -180,7 +180,7 @@ export function PortfolioForm({
       <Button
         type="submit"
         disabled={saving}
-        className="w-full bg-[#5e6ad2] hover:bg-[#6e7ae2] text-white font-medium"
+        className="w-full bg-[#4ade80] hover:bg-[#22c55e] text-[#0e0e0e] font-medium rounded-md"
       >
         {saving ? (
           <>

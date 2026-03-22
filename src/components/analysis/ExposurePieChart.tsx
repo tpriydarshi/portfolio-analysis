@@ -4,21 +4,21 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import type { StockExposure } from "@/lib/aggregation/types";
 
 const COLORS = [
-  "#5e6ad2",
-  "#8b5cf6",
-  "#06b6d4",
-  "#10b981",
+  "#4ade80",
+  "#facc15",
+  "#bac3ff",
+  "#ec7c8a",
+  "#a8b4ff",
+  "#22d3ee",
   "#f59e0b",
-  "#ef4444",
-  "#ec4899",
+  "#10b981",
+  "#e4ebff",
+  "#9f9da1",
   "#6366f1",
   "#14b8a6",
   "#f97316",
   "#84cc16",
   "#a855f7",
-  "#3b82f6",
-  "#22d3ee",
-  "#facc15",
   "#78716c",
 ];
 
@@ -40,60 +40,67 @@ export function ExposurePieChart({ stocks }: ExposurePieChartProps) {
   ];
 
   return (
-    <div className="bg-[#0f1011] border border-[rgba(255,255,255,0.08)] rounded-xl p-5">
-      <h3 className="text-sm font-medium text-[#b4bcd0] mb-4">
-        Stock Exposure Distribution
+    <div className="bg-[#131313] rounded-md p-5">
+      <h3 className="text-xs text-[#9f9da1] uppercase tracking-wider font-medium mb-4">
+        Sectors
       </h3>
-      <div className="h-[300px]">
-        <ResponsiveContainer width="100%" height="100%">
-          <PieChart>
-            <Pie
-              data={data}
-              cx="50%"
-              cy="50%"
-              innerRadius={60}
-              outerRadius={120}
-              paddingAngle={1}
-              dataKey="value"
-              stroke="none"
-            >
-              {data.map((_, index) => (
-                <Cell
-                  key={`cell-${index}`}
-                  fill={COLORS[index % COLORS.length]}
+      <div className="flex items-center gap-6">
+        <div className="h-[240px] w-[240px] shrink-0">
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <Pie
+                data={data}
+                cx="50%"
+                cy="50%"
+                innerRadius={55}
+                outerRadius={100}
+                paddingAngle={2}
+                dataKey="value"
+                stroke="none"
+              >
+                {data.map((_, index) => (
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={COLORS[index % COLORS.length]}
+                  />
+                ))}
+              </Pie>
+              <Tooltip
+                content={({ active, payload }) => {
+                  if (!active || !payload?.length) return null;
+                  const d = payload[0];
+                  return (
+                    <div className="bg-[#252626] rounded-md px-3 py-2 shadow-[0_20px_40px_rgba(0,0,0,0.4)]">
+                      <p className="text-xs text-[#e7e5e5]">{d.name}</p>
+                      <p className="text-xs font-mono text-[#4ade80]">
+                        {d.value}%
+                      </p>
+                    </div>
+                  );
+                }}
+              />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+        {/* Legend */}
+        <div className="space-y-2 flex-1">
+          {data.slice(0, 8).map((d, i) => (
+            <div key={d.name} className="flex items-center justify-between">
+              <div className="flex items-center gap-2 min-w-0">
+                <div
+                  className="w-2.5 h-2.5 rounded-full shrink-0"
+                  style={{ backgroundColor: COLORS[i % COLORS.length] }}
                 />
-              ))}
-            </Pie>
-            <Tooltip
-              content={({ active, payload }) => {
-                if (!active || !payload?.length) return null;
-                const d = payload[0];
-                return (
-                  <div className="bg-[#1a1b1e] border border-[rgba(255,255,255,0.08)] rounded-lg px-3 py-2 shadow-xl">
-                    <p className="text-xs text-[#f7f8f8]">{d.name}</p>
-                    <p className="text-xs font-mono text-[#5e6ad2]">
-                      {d.value}%
-                    </p>
-                  </div>
-                );
-              }}
-            />
-          </PieChart>
-        </ResponsiveContainer>
-      </div>
-      {/* Legend */}
-      <div className="mt-4 flex flex-wrap gap-x-4 gap-y-1.5">
-        {data.slice(0, 10).map((d, i) => (
-          <div key={d.name} className="flex items-center gap-1.5">
-            <div
-              className="w-2.5 h-2.5 rounded-sm"
-              style={{ backgroundColor: COLORS[i % COLORS.length] }}
-            />
-            <span className="text-xs text-[#8a8f98] truncate max-w-[120px]">
-              {d.name}
-            </span>
-          </div>
-        ))}
+                <span className="text-xs text-[#acabaa] truncate">
+                  {d.name}
+                </span>
+              </div>
+              <span className="text-xs font-mono text-[#9f9da1] ml-2 shrink-0">
+                {d.value}%
+              </span>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

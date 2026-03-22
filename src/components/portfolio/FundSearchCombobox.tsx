@@ -73,30 +73,30 @@ export function FundSearchCombobox({ onSelect }: FundSearchComboboxProps) {
   return (
     <div ref={wrapperRef} className="relative">
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#8a8f98]" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#767575]" />
         <Input
           value={query}
           onChange={(e) => handleSearch(e.target.value)}
           placeholder="Search mutual funds..."
-          className="pl-9 bg-[#0a0a0b] border-[rgba(255,255,255,0.08)] text-[#f7f8f8] placeholder:text-[#8a8f98] focus:border-[#5e6ad2]"
+          className="pl-9 bg-[#000000] border-none text-[#e7e5e5] placeholder:text-[#767575] focus:ring-1 focus:ring-[#bac3ff]/40"
         />
         {loading && (
-          <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#8a8f98] animate-spin" />
+          <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#767575] animate-spin" />
         )}
       </div>
 
       {open && results.length > 0 && (
-        <div className="absolute z-50 mt-1 w-full max-h-64 overflow-y-auto bg-[#0f1011] border border-[rgba(255,255,255,0.08)] rounded-lg shadow-xl">
+        <div className="absolute z-50 mt-1 w-full max-h-64 overflow-y-auto bg-[#191a1a] rounded-md shadow-[0_20px_40px_rgba(0,0,0,0.4)]">
           {results.map((scheme) => (
             <button
               key={scheme.schemeCode}
               onClick={() => handleSelect(scheme)}
-              className="w-full text-left px-3 py-2.5 hover:bg-[rgba(255,255,255,0.04)] transition-colors border-b border-[rgba(255,255,255,0.04)] last:border-b-0"
+              className="w-full text-left px-3 py-2.5 hover:bg-[#1f2020] transition-colors"
             >
-              <p className="text-sm text-[#f7f8f8] leading-snug">
+              <p className="text-sm text-[#e7e5e5] leading-snug">
                 {scheme.schemeName}
               </p>
-              <p className="text-xs text-[#8a8f98] mt-0.5">
+              <p className="text-xs text-[#767575] mt-0.5">
                 Code: {scheme.schemeCode}
               </p>
             </button>
@@ -105,8 +105,8 @@ export function FundSearchCombobox({ onSelect }: FundSearchComboboxProps) {
       )}
 
       {open && results.length === 0 && !loading && query.length >= 2 && (
-        <div className="absolute z-50 mt-1 w-full bg-[#0f1011] border border-[rgba(255,255,255,0.08)] rounded-lg p-4 text-center">
-          <p className="text-sm text-[#8a8f98]">No schemes found</p>
+        <div className="absolute z-50 mt-1 w-full bg-[#191a1a] rounded-md shadow-[0_20px_40px_rgba(0,0,0,0.4)] p-4 text-center">
+          <p className="text-sm text-[#767575]">No schemes found</p>
         </div>
       )}
     </div>
