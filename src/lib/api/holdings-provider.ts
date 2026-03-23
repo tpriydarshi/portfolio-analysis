@@ -3,19 +3,34 @@ import { AMC_REGISTRY, parsePortfolioExcel, findMatchingScheme, getAmcIdForSchem
 import { fetchHoldingsFromGroww } from "./groww";
 
 /**
+ * In-flight request deduplication map.
+ * Multiple concurrent callers for the same scheme code share a single fetch promise,
+ * preventing redundant external API calls (e.g., when several users analyze portfolios
+ * that contain the same fund).
+ */
+const inflightRequests = new Map<number, Promise<RawHolding[]>>();
+
+/**
  * Holdings provider with fallback chain:
  * 1. Check Supabase cache (handled by caller in API route)
  * 2. On-demand AMFI fetch: download + parse AMC Excel for the specific scheme
  * 3. Groww.in API fallback: search + fetch holdings for any scheme
  *
  * If all sources fail, returns empty array so the caller can handle gracefully.
+ *
+ * @param schemeName - Optional scheme name from caller (e.g., portfolio_funds.scheme_name).
+ *   When provided, skips the extra mfapi.in lookup to resolve the name.
  */
 export async function fetchHoldingsWithFallback(
-  schemeCode: number
+  schemeCode: number,
+  schemeName?: string
 ): Promise<RawHolding[]> {
+  // Resolve scheme name once: prefer caller-provided, fall back to mfapi.in
+  const resolvedName = schemeName ?? (await getSchemeNameFromMfApi(schemeCode));
+
   // Step 1: Try AMFI Excel
   try {
-    const holdings = await fetchFromAmfi(schemeCode);
+    const holdings = await fetchFromAmfi(schemeCode, resolvedName);
     if (holdings.length > 0) return holdings;
   } catch (e) {
     console.warn(`AMFI fetch failed for ${schemeCode}:`, e);
@@ -23,9 +38,8 @@ export async function fetchHoldingsWithFallback(
 
   // Step 2: Try Groww.in
   try {
-    const schemeName = await getSchemeNameFromMfApi(schemeCode);
-    if (schemeName) {
-      const holdings = await fetchHoldingsFromGroww(schemeCode, schemeName);
+    if (resolvedName) {
+      const holdings = await fetchHoldingsFromGroww(schemeCode, resolvedName);
       if (holdings.length > 0) return holdings;
     }
   } catch (e) {
@@ -40,9 +54,31 @@ export async function fetchHoldingsWithFallback(
   return [];
 }
 
-async function fetchFromAmfi(schemeCode: number): Promise<RawHolding[]> {
+/**
+ * Deduplicated entry point for fetching holdings.
+ * If a fetch for the given scheme code is already in-flight, returns the existing
+ * promise instead of starting a new one. The promise is removed from the map on
+ * completion (success or failure) so subsequent calls trigger a fresh fetch.
+ */
+export function fetchHoldingsDeduped(
+  schemeCode: number,
+  schemeName?: string
+): Promise<RawHolding[]> {
+  const existing = inflightRequests.get(schemeCode);
+  if (existing) return existing;
+
+  const promise = fetchHoldingsWithFallback(schemeCode, schemeName).finally(
+    () => inflightRequests.delete(schemeCode)
+  );
+  inflightRequests.set(schemeCode, promise);
+  return promise;
+}
+
+async function fetchFromAmfi(
+  schemeCode: number,
+  schemeName: string | null
+): Promise<RawHolding[]> {
   const amcId = getAmcIdForScheme(schemeCode);
-  const schemeName = await getSchemeNameFromMfApi(schemeCode);
 
   // Find the AMC either by curated mapping or by matching scheme name
   let amc = amcId ? AMC_REGISTRY.find((a) => a.id === amcId) : undefined;

@@ -7,7 +7,7 @@ export function AnalysisSummaryCard({ result }: { result: AggregatedResult }) {
     {
       label: "Total Stocks",
       value: result.totalStocks.toString(),
-      sub: result.totalStocks > 30 ? "+3 from last scan" : undefined,
+      sub: undefined,
     },
     {
       label: "Top Holding",
@@ -24,7 +24,7 @@ export function AnalysisSummaryCard({ result }: { result: AggregatedResult }) {
     {
       label: "Portfolio Coverage",
       value: `${result.totalCoverage.toFixed(1)}%`,
-      sub: result.totalCoverage > 90 ? "Nifty 50 benchmark" : undefined,
+      sub: result.totalCoverage > 90 ? "High data quality" : undefined,
     },
   ];
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams } from "next/navigation";
 import { AnalysisSummaryCard } from "@/components/analysis/AnalysisSummaryCard";
 import { StockExposureTable } from "@/components/analysis/StockExposureTable";
@@ -8,9 +8,17 @@ import { ExposurePieChart } from "@/components/analysis/ExposurePieChart";
 import { SectorBarChart } from "@/components/analysis/SectorBarChart";
 import { OverlapHighlight } from "@/components/analysis/OverlapHighlight";
 import type { AggregatedResult } from "@/lib/aggregation/types";
-import { Loader2, ArrowLeft } from "lucide-react";
+import { Loader2, ArrowLeft, RefreshCw, AlertTriangle } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+
+function formatDataAsOf(dateString: string): string {
+  const date = new Date(dateString);
+  return date.toLocaleDateString("en-IN", {
+    month: "long",
+    year: "numeric",
+  });
+}
 
 export default function AnalysisPage() {
   const { id } = useParams<{ id: string }>();
@@ -18,12 +26,15 @@ export default function AnalysisPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    async function analyze() {
+  const runAnalysis = useCallback(
+    async (forceRefresh = false) => {
+      setLoading(true);
+      setError(null);
       try {
-        const res = await fetch(`/api/portfolios/${id}/analyze`, {
-          method: "POST",
-        });
+        const url = forceRefresh
+          ? `/api/portfolios/${id}/analyze?forceRefresh=true`
+          : `/api/portfolios/${id}/analyze`;
+        const res = await fetch(url, { method: "POST" });
         if (!res.ok) {
           const data = await res.json();
           throw new Error(data.error || "Analysis failed");
@@ -35,10 +46,13 @@ export default function AnalysisPage() {
       } finally {
         setLoading(false);
       }
-    }
+    },
+    [id]
+  );
 
-    analyze();
-  }, [id]);
+  useEffect(() => {
+    runAnalysis();
+  }, [runAnalysis]);
 
   if (loading) {
     return (
@@ -87,14 +101,53 @@ export default function AnalysisPage() {
           <ArrowLeft className="h-3.5 w-3.5" />
           Back to portfolio
         </Link>
-        <h1 className="font-heading text-4xl font-semibold text-[#e7e5e5] tracking-tight">
-          Portfolio Analysis
-        </h1>
-        <p className="text-sm text-[#acabaa] mt-2 max-w-xl">
-          An editorial deep-dive into your asset distribution, fund overlaps,
-          and risk concentration. Precision data for the modern archivist.
-        </p>
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h1 className="font-heading text-4xl font-semibold text-[#e7e5e5] tracking-tight">
+              Portfolio Analysis
+            </h1>
+            <p className="text-sm text-[#acabaa] mt-2 max-w-xl">
+              An editorial deep-dive into your asset distribution, fund overlaps,
+              and risk concentration. Precision data for the modern archivist.
+            </p>
+            {result.dataAsOf && (
+              <p className="text-xs text-[#767575] mt-1">
+                Data as of: {formatDataAsOf(result.dataAsOf)}
+              </p>
+            )}
+          </div>
+          <Button
+            onClick={() => runAnalysis(true)}
+            variant="outline"
+            size="sm"
+            className="shrink-0 border-[rgba(255,255,255,0.08)] hover:border-[rgba(255,255,255,0.15)] text-[#acabaa] hover:text-[#e7e5e5] bg-transparent"
+          >
+            <RefreshCw className="h-3.5 w-3.5 mr-1.5" />
+            Re-analyze
+          </Button>
+        </div>
       </div>
+
+      {/* Warnings banner */}
+      {result.warnings && result.warnings.length > 0 && (
+        <div className="bg-[#1a1a0e] border border-[rgba(250,204,21,0.2)] rounded-lg p-4 mb-8">
+          <div className="flex items-start gap-3">
+            <AlertTriangle className="h-4 w-4 text-[#facc15] mt-0.5 shrink-0" />
+            <div>
+              <p className="text-sm font-medium text-[#facc15] mb-1">
+                Some funds could not be fully analyzed
+              </p>
+              <ul className="space-y-0.5">
+                {result.warnings.map((warning, i) => (
+                  <li key={i} className="text-xs text-[#acabaa]">
+                    {warning}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Summary stats */}
       <div className="mb-8">

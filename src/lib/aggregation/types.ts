@@ -28,6 +28,8 @@ export interface AggregatedResult {
   topHolding: StockExposure | null;
   top10Concentration: number;
   fundOverlaps: FundOverlap[];
+  warnings?: string[];
+  dataAsOf?: string;
 }
 
 export interface FundOverlap {

@@ -64,12 +64,36 @@ export function resolveIsin(
   const exact = lookup.get(normalized);
   if (exact) return exact;
 
-  // Try matching with common variations
-  // e.g., "Infosys" should match "Infosys Ltd"
-  for (const [key, isin] of lookup) {
-    if (key.startsWith(normalized) || normalized.startsWith(key)) {
-      return isin;
+  // Fuzzy match: only attempt if the normalized name is long enough to be
+  // meaningfully unique (avoids short prefixes like "hdfc" colliding).
+  if (normalized.length >= 8) {
+    let bestMatch: string | undefined;
+    let bestOverlap = 0;
+
+    for (const [key, isin] of lookup) {
+      if (key.length < 8) continue;
+
+      // Check if one string is a prefix of the other
+      const shorter = normalized.length <= key.length ? normalized : key;
+      const longer = normalized.length <= key.length ? key : normalized;
+
+      if (!longer.startsWith(shorter)) continue;
+
+      // Require the overlap (shorter length) to cover at least 80% of the
+      // longer string's length. This prevents "hdfc bank" from matching
+      // "hdfc life insurance" — the overlap is too small relative to the
+      // longer candidate.
+      const overlapRatio = shorter.length / longer.length;
+      if (overlapRatio < 0.8) continue;
+
+      // Among qualifying matches, prefer the longest overlap (most specific)
+      if (shorter.length > bestOverlap) {
+        bestOverlap = shorter.length;
+        bestMatch = isin;
+      }
     }
+
+    if (bestMatch) return bestMatch;
   }
 
   // Generate synthetic ISIN

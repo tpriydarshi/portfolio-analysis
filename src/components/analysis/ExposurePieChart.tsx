@@ -42,7 +42,7 @@ export function ExposurePieChart({ stocks }: ExposurePieChartProps) {
   return (
     <div className="bg-[#131313] rounded-md p-5">
       <h3 className="text-xs text-[#9f9da1] uppercase tracking-wider font-medium mb-4">
-        Sectors
+        Top Holdings
       </h3>
       <div className="flex items-center gap-6">
         <div className="h-[240px] w-[240px] shrink-0">

@@ -1,4 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/admin";
+import { createClient } from "@/lib/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
@@ -8,13 +9,25 @@ export async function GET(request: NextRequest) {
     return NextResponse.json([]);
   }
 
+  // Authentication check
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   try {
-    // Check cache first
-    const admin = createAdminClient();
-    const { data: cached } = await admin
+    // Escape LIKE wildcards in user input to prevent wildcard injection
+    const escapedQuery = query.replace(/%/g, "\\%").replace(/_/g, "\\_");
+
+    // Check cache first (use regular server client — respects RLS)
+    const { data: cached } = await supabase
       .from("scheme_search_cache")
       .select("*")
-      .ilike("scheme_name", `%${query}%`)
+      .ilike("scheme_name", `%${escapedQuery}%`)
       .limit(30);
 
     if (cached && cached.length > 0) {
@@ -40,8 +53,9 @@ export async function GET(request: NextRequest) {
       await res.json();
     const results = data.slice(0, 50);
 
-    // Cache results (fire and forget)
+    // Cache results (fire and forget) — admin client needed to bypass RLS for writes
     if (results.length > 0) {
+      const admin = createAdminClient();
       const rows = results.map((r) => ({
         scheme_code: r.schemeCode,
         scheme_name: r.schemeName,

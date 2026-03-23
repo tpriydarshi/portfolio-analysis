@@ -1,6 +1,7 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
-import { fetchHoldingsWithFallback } from "@/lib/api/holdings-provider";
+import { fetchHoldingsDeduped } from "@/lib/api/holdings-provider";
+import { upsertHoldingsCache } from "@/lib/api/holdings-cache";
 import { NextRequest, NextResponse } from "next/server";
 
 const CACHE_DAYS = 30;
@@ -48,27 +49,10 @@ export async function GET(
     }
 
     // Fetch from API with fallback to sample data
-    const holdings = await fetchHoldingsWithFallback(schemeCode);
+    const holdings = await fetchHoldingsDeduped(schemeCode);
 
     if (holdings.length > 0) {
-      const now = new Date().toISOString();
-
-      // Delete old cache before inserting to prevent duplicates
-      await admin
-        .from("holdings_cache")
-        .delete()
-        .eq("scheme_code", schemeCode);
-
-      const rows = holdings.map((h) => ({
-        scheme_code: schemeCode,
-        stock_isin: h.stock_isin,
-        stock_name: h.stock_name,
-        holding_pct: h.holding_pct,
-        sector: h.sector,
-        fetched_at: now,
-      }));
-
-      await admin.from("holdings_cache").insert(rows);
+      await upsertHoldingsCache(admin, schemeCode, holdings);
     }
 
     return NextResponse.json({ holdings, source: "api" });
