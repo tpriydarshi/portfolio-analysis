@@ -8,7 +8,8 @@ import { ExposurePieChart } from "@/components/analysis/ExposurePieChart";
 import { SectorBarChart } from "@/components/analysis/SectorBarChart";
 import { OverlapHighlight } from "@/components/analysis/OverlapHighlight";
 import type { AggregatedResult } from "@/lib/aggregation/types";
-import { Loader2, ArrowLeft, RefreshCw, AlertTriangle } from "lucide-react";
+import { ArrowLeft, RefreshCw, AlertTriangle } from "lucide-react";
+import { AnalysisSkeleton } from "@/components/analysis/AnalysisSkeleton";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
@@ -34,7 +35,7 @@ export default function AnalysisPage() {
         const url = forceRefresh
           ? `/api/portfolios/${id}/analyze?forceRefresh=true`
           : `/api/portfolios/${id}/analyze`;
-        const res = await fetch(url, { method: "POST" });
+        const res = await fetch(url);
         if (!res.ok) {
           const data = await res.json();
           throw new Error(data.error || "Analysis failed");
@@ -55,17 +56,7 @@ export default function AnalysisPage() {
   }, [runAnalysis]);
 
   if (loading) {
-    return (
-      <div className="max-w-7xl mx-auto px-6 py-20 text-center">
-        <Loader2 className="h-8 w-8 text-[#bac3ff] animate-spin mx-auto mb-4" />
-        <p className="text-[#acabaa]">
-          Analyzing your portfolio holdings...
-        </p>
-        <p className="text-xs text-[#767575] mt-1">
-          This may take a moment as we fetch fund data
-        </p>
-      </div>
-    );
+    return <AnalysisSkeleton />;
   }
 
   if (error) {

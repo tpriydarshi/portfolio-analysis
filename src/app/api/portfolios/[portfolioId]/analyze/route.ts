@@ -27,7 +27,7 @@ function buildHoldingsHash(
   return computeHash(`${key}|${updatedAt}`);
 }
 
-export async function POST(
+export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ portfolioId: string }> }
 ) {
@@ -202,7 +202,9 @@ export async function POST(
       { onConflict: "portfolio_id" }
     );
 
-    return NextResponse.json(responsePayload);
+    return NextResponse.json(responsePayload, {
+      headers: { "Cache-Control": "no-store" },
+    });
   } catch (error) {
     console.error("Analysis error:", error);
     return NextResponse.json(

@@ -77,6 +77,7 @@ export function Navbar() {
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger
+                aria-label="User menu"
                 className="h-8 w-8 rounded-md bg-[#2f3f92]/30 text-[#bac3ff] hover:bg-[#2f3f92]/50 flex items-center justify-center cursor-pointer transition-colors"
               >
                 <User className="h-4 w-4" />

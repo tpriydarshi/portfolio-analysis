@@ -16,7 +16,7 @@ interface SectorBarChartProps {
 
 export function SectorBarChart({ sectors }: SectorBarChartProps) {
   const data = sectors.slice(0, 15).map((s) => ({
-    name: s.sector.length > 20 ? s.sector.slice(0, 18) + "..." : s.sector,
+    name: s.sector.length > 15 ? s.sector.slice(0, 13) + "..." : s.sector,
     fullName: s.sector,
     exposure: +s.exposurePct.toFixed(2),
     stocks: s.stockCount,
@@ -29,7 +29,7 @@ export function SectorBarChart({ sectors }: SectorBarChartProps) {
       </h3>
       <div className="h-[350px]">
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={data} layout="vertical" margin={{ left: 80 }}>
+          <BarChart data={data} layout="vertical" margin={{ left: 60 }}>
             <XAxis
               type="number"
               tick={{ fill: "#767575", fontSize: 11 }}

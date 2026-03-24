@@ -19,6 +19,7 @@ export function FundSearchCombobox({ onSelect }: FundSearchComboboxProps) {
   const [results, setResults] = useState<SchemeResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(-1);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -50,6 +51,7 @@ export function FundSearchCombobox({ onSelect }: FundSearchComboboxProps) {
         const data = await res.json();
         if (Array.isArray(data)) {
           setResults(data);
+          setActiveIndex(-1);
           setOpen(true);
         }
       } catch {
@@ -68,6 +70,37 @@ export function FundSearchCombobox({ onSelect }: FundSearchComboboxProps) {
     setQuery("");
     setResults([]);
     setOpen(false);
+    setActiveIndex(-1);
+  }
+
+  function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (!open || results.length === 0) return;
+
+    switch (e.key) {
+      case "ArrowDown":
+        e.preventDefault();
+        setActiveIndex((prev) =>
+          prev >= results.length - 1 ? 0 : prev + 1
+        );
+        break;
+      case "ArrowUp":
+        e.preventDefault();
+        setActiveIndex((prev) =>
+          prev <= 0 ? results.length - 1 : prev - 1
+        );
+        break;
+      case "Enter":
+        e.preventDefault();
+        if (activeIndex >= 0 && activeIndex < results.length) {
+          handleSelect(results[activeIndex]);
+        }
+        break;
+      case "Escape":
+        e.preventDefault();
+        setOpen(false);
+        setActiveIndex(-1);
+        break;
+    }
   }
 
   return (
@@ -77,7 +110,12 @@ export function FundSearchCombobox({ onSelect }: FundSearchComboboxProps) {
         <Input
           value={query}
           onChange={(e) => handleSearch(e.target.value)}
+          onKeyDown={handleKeyDown}
           placeholder="Search mutual funds..."
+          role="combobox"
+          aria-expanded={open}
+          aria-activedescendant={activeIndex >= 0 ? `option-${activeIndex}` : undefined}
+          aria-autocomplete="list"
           className="pl-9 bg-[#000000] border-none text-[#e7e5e5] placeholder:text-[#767575] focus:ring-1 focus:ring-[#bac3ff]/40"
         />
         {loading && (
@@ -86,12 +124,15 @@ export function FundSearchCombobox({ onSelect }: FundSearchComboboxProps) {
       </div>
 
       {open && results.length > 0 && (
-        <div className="absolute z-50 mt-1 w-full max-h-64 overflow-y-auto bg-[#191a1a] rounded-md shadow-[0_20px_40px_rgba(0,0,0,0.4)]">
-          {results.map((scheme) => (
+        <div role="listbox" className="absolute z-50 mt-1 w-full max-h-64 overflow-y-auto bg-[#191a1a] rounded-md shadow-[0_20px_40px_rgba(0,0,0,0.4)]">
+          {results.map((scheme, index) => (
             <button
               key={scheme.schemeCode}
+              id={`option-${index}`}
+              role="option"
+              aria-selected={index === activeIndex}
               onClick={() => handleSelect(scheme)}
-              className="w-full text-left px-3 py-2.5 hover:bg-[#1f2020] transition-colors"
+              className={`w-full text-left px-3 py-2.5 hover:bg-[#1f2020] transition-colors ${index === activeIndex ? "bg-[#1f2020]" : ""}`}
             >
               <p className="text-sm text-[#e7e5e5] leading-snug">
                 {scheme.schemeName}

@@ -2,7 +2,7 @@
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { X } from "lucide-react";
+import { X, Divide } from "lucide-react";
 import type { FundEntry } from "@/lib/validation/portfolio";
 
 interface FundAllocationListProps {
@@ -15,7 +15,9 @@ export function FundAllocationList({
   onChange,
 }: FundAllocationListProps) {
   const totalPct = funds.reduce((acc, f) => acc + f.allocationPct, 0);
-  const isValid = Math.abs(totalPct - 100) < 0.01;
+  const remaining = 100 - totalPct;
+  const isValid = Math.abs(remaining) < 0.01;
+  const isOver = remaining < -0.01;
 
   function updateAllocation(index: number, value: string) {
     const pct = parseFloat(value) || 0;
@@ -27,6 +29,33 @@ export function FundAllocationList({
   function removeFund(index: number) {
     onChange(funds.filter((_, i) => i !== index));
   }
+
+  function equalSplit() {
+    if (funds.length === 0) return;
+    const base = Math.floor((10000 / funds.length)) / 100; // 2 decimal places
+    const total = parseFloat((base * funds.length).toFixed(2));
+    const diff = parseFloat((100 - total).toFixed(2));
+    const updated = funds.map((f, i) => ({
+      ...f,
+      allocationPct: i === 0 ? parseFloat((base + diff).toFixed(2)) : base,
+    }));
+    onChange(updated);
+  }
+
+  // Progress bar color logic
+  const progressPct = Math.min(totalPct, 100);
+  const barColor = isValid
+    ? "#4ade80"
+    : isOver
+      ? "#ec7c8a"
+      : "#facc15";
+
+  // Remaining text color
+  const remainingColor = isValid
+    ? "#facc15"
+    : isOver
+      ? "#ec7c8a"
+      : "#4ade80";
 
   if (funds.length === 0) {
     return (
@@ -40,6 +69,30 @@ export function FundAllocationList({
 
   return (
     <div className="space-y-2">
+      {/* Header row: remaining helper + equal split button */}
+      <div className="flex items-center justify-between px-1">
+        <span
+          className="text-xs font-mono font-medium"
+          style={{ color: remainingColor }}
+        >
+          {isValid
+            ? "Fully allocated"
+            : isOver
+              ? `${Math.abs(remaining).toFixed(2)}% over-allocated`
+              : `${remaining.toFixed(2)}% remaining`}
+        </span>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={equalSplit}
+          className="h-7 px-2.5 text-xs text-[#bac3ff] hover:text-[#e7e5e5] hover:bg-[#bac3ff]/10 gap-1.5"
+        >
+          <Divide className="h-3 w-3" />
+          Equal Split
+        </Button>
+      </div>
+
       {funds.map((fund, index) => (
         <div
           key={fund.schemeCode}
@@ -73,21 +126,32 @@ export function FundAllocationList({
         </div>
       ))}
 
-      {/* Total bar */}
-      <div className="flex items-center justify-between px-3 py-2 bg-[#000000] rounded-md">
-        <span className="text-sm text-[#acabaa]">Total Allocation</span>
-        <div className="flex items-center gap-2">
+      {/* Progress bar + total */}
+      <div className="bg-[#000000] rounded-md px-3 py-2.5 space-y-2">
+        <div className="flex items-center justify-between">
+          <span className="text-sm text-[#9f9da1]">Total Allocation</span>
           <span
-            className={`font-mono text-sm font-medium ${
-              isValid ? "text-[#4ade80]" : "text-[#facc15]"
-            }`}
+            className="font-mono text-sm font-medium"
+            style={{ color: barColor }}
           >
             {totalPct.toFixed(2)}%
           </span>
-          {!isValid && (
-            <span className="text-xs text-[#facc15]">Must equal 100%</span>
-          )}
         </div>
+        {/* Visual progress bar */}
+        <div className="relative h-1.5 w-full rounded-full bg-[#131313] overflow-hidden">
+          <div
+            className="absolute inset-y-0 left-0 rounded-full transition-all duration-300 ease-out"
+            style={{
+              width: `${Math.min(progressPct, 100)}%`,
+              backgroundColor: barColor,
+            }}
+          />
+        </div>
+        {!isValid && (
+          <p className="text-xs" style={{ color: barColor }}>
+            {isOver ? "Over-allocated — reduce some funds" : "Must equal 100%"}
+          </p>
+        )}
       </div>
     </div>
   );

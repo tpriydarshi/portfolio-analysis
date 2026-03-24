@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { FundSearchCombobox } from "./FundSearchCombobox";
 import { FundAllocationList } from "./FundAllocationList";
 import type { FundEntry } from "@/lib/validation/portfolio";
+import { portfolioSchema } from "@/lib/validation/portfolio";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 
@@ -44,17 +45,16 @@ export function PortfolioForm({
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
-    const totalPct = funds.reduce((acc, f) => acc + f.allocationPct, 0);
-    if (funds.length === 0) {
-      toast.error("Add at least one fund");
-      return;
-    }
-    if (Math.abs(totalPct - 100) >= 0.01) {
-      toast.error("Fund allocations must sum to 100%");
-      return;
-    }
-    if (!name.trim()) {
-      toast.error("Portfolio name is required");
+    const totalValueInr = totalValue ? parseFloat(totalValue) : null;
+    const result = portfolioSchema.safeParse({
+      name: name.trim(),
+      totalValueInr,
+      funds,
+    });
+
+    if (!result.success) {
+      const firstError = result.error.issues[0];
+      toast.error(firstError.message);
       return;
     }
 
@@ -71,11 +71,9 @@ export function PortfolioForm({
         return;
       }
 
-      const totalValueInr = totalValue ? parseFloat(totalValue) : null;
-
       if (portfolioId) {
         // Update existing
-        await supabase
+        const { error: updateError } = await supabase
           .from("portfolios")
           .update({
             name: name.trim(),
@@ -84,20 +82,34 @@ export function PortfolioForm({
           })
           .eq("id", portfolioId);
 
+        if (updateError) {
+          throw new Error(updateError.message);
+        }
+
         // Delete old funds and re-insert
-        await supabase
+        const { error: deleteError } = await supabase
           .from("portfolio_funds")
           .delete()
           .eq("portfolio_id", portfolioId);
 
-        await supabase.from("portfolio_funds").insert(
-          funds.map((f) => ({
-            portfolio_id: portfolioId,
-            scheme_code: f.schemeCode,
-            scheme_name: f.schemeName,
-            allocation_pct: f.allocationPct,
-          }))
-        );
+        if (deleteError) {
+          throw new Error(deleteError.message);
+        }
+
+        const { error: insertFundsError } = await supabase
+          .from("portfolio_funds")
+          .insert(
+            funds.map((f) => ({
+              portfolio_id: portfolioId,
+              scheme_code: f.schemeCode,
+              scheme_name: f.schemeName,
+              allocation_pct: f.allocationPct,
+            }))
+          );
+
+        if (insertFundsError) {
+          throw new Error(insertFundsError.message);
+        }
 
         toast.success("Portfolio updated");
         router.push(`/portfolio/${portfolioId}`);
@@ -117,14 +129,20 @@ export function PortfolioForm({
           throw new Error(error?.message || "Failed to create portfolio");
         }
 
-        await supabase.from("portfolio_funds").insert(
-          funds.map((f) => ({
-            portfolio_id: portfolio.id,
-            scheme_code: f.schemeCode,
-            scheme_name: f.schemeName,
-            allocation_pct: f.allocationPct,
-          }))
-        );
+        const { error: insertFundsError } = await supabase
+          .from("portfolio_funds")
+          .insert(
+            funds.map((f) => ({
+              portfolio_id: portfolio.id,
+              scheme_code: f.schemeCode,
+              scheme_name: f.schemeName,
+              allocation_pct: f.allocationPct,
+            }))
+          );
+
+        if (insertFundsError) {
+          throw new Error(insertFundsError.message);
+        }
 
         toast.success("Portfolio created");
         router.push(`/portfolio/${portfolio.id}`);

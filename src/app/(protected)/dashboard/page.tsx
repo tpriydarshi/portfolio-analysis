@@ -121,7 +121,7 @@ export default async function DashboardPage() {
       {portfolios.length > 0 ? (
         <div className="bg-[#131313] rounded-md overflow-hidden">
           {/* Table header */}
-          <div className="grid grid-cols-[2fr_1fr_1fr_1fr] gap-4 px-5 py-3">
+          <div className="hidden md:grid grid-cols-[2fr_1fr_1fr_1fr] gap-4 px-5 py-3">
             <span className="text-xs text-[#9f9da1] uppercase tracking-wider font-medium">
               Portfolio
             </span>

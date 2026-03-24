@@ -9,6 +9,28 @@
  * [scheme_code, date, company_name, type, sector, asset_class, ?, value, pct, ?, ?, stock_slug]
  */
 
+// --- Circuit breaker state ---
+let consecutiveFailures = 0;
+let circuitOpenUntil = 0;
+
+function isCircuitOpen(): boolean {
+  return Date.now() < circuitOpenUntil;
+}
+
+function recordSuccess(): void {
+  consecutiveFailures = 0;
+}
+
+function recordFailure(context: string): void {
+  consecutiveFailures++;
+  if (consecutiveFailures >= 3) {
+    circuitOpenUntil = Date.now() + 10 * 60 * 1000; // 10 minutes
+    console.warn(
+      `[Groww circuit breaker] Circuit OPEN after ${consecutiveFailures} consecutive failures (${context}). Will retry after 10 minutes.`
+    );
+  }
+}
+
 const GROWW_BASE = "https://groww.in/v1/api";
 const GROWW_HEADERS = {
   "User-Agent":
@@ -88,12 +110,23 @@ export async function findGrowwSlug(
 
   const url = `${GROWW_BASE}/search/v1/entity?entity_type=scheme&q=${encodeURIComponent(searchQuery)}&size=10`;
 
+  if (isCircuitOpen()) {
+    console.warn("[Groww circuit breaker] Circuit is open — skipping findGrowwSlug");
+    return null;
+  }
+
   try {
     const res = await fetch(url, { headers: GROWW_HEADERS });
-    if (!res.ok) return null;
+    if (!res.ok) {
+      recordFailure(`findGrowwSlug HTTP ${res.status}`);
+      return null;
+    }
 
     const data: GrowwEntityResponse = await res.json();
     const results = data.content ?? [];
+
+    recordSuccess();
+
     if (results.length === 0) return null;
 
     // Strategy 1: Exact match by scheme_code (most reliable)
@@ -117,6 +150,7 @@ export async function findGrowwSlug(
     // No confident match found
     return null;
   } catch {
+    recordFailure("findGrowwSlug network error");
     return null;
   }
 }
@@ -154,11 +188,20 @@ export async function fetchGrowwHoldings(
 ): Promise<GrowwHolding[]> {
   const url = `${GROWW_BASE}/data/mf/web/v1/scheme/search/${encodeURIComponent(slug)}`;
 
+  if (isCircuitOpen()) {
+    console.warn("[Groww circuit breaker] Circuit is open — skipping fetchGrowwHoldings");
+    return [];
+  }
+
   try {
     const res = await fetch(url, { headers: GROWW_HEADERS });
-    if (!res.ok) return [];
+    if (!res.ok) {
+      recordFailure(`fetchGrowwHoldings HTTP ${res.status}`);
+      return [];
+    }
 
     const data: GrowwDetailResponse = await res.json();
+    recordSuccess();
     const raw = data.holdings ?? [];
 
     const valid = raw
@@ -200,6 +243,7 @@ export async function fetchGrowwHoldings(
       stock_search_id: data.stock_search_id,
     }));
   } catch {
+    recordFailure("fetchGrowwHoldings network error");
     return [];
   }
 }

@@ -7,7 +7,7 @@ import { BarChart3, Plus } from "lucide-react";
 export function PortfolioCard({ portfolio }: { portfolio: Portfolio }) {
   return (
     <Link href={`/portfolio/${portfolio.id}`}>
-      <div className="grid grid-cols-[2fr_1fr_1fr_1fr] gap-4 px-5 py-4 hover:bg-[#1f2020] transition-colors cursor-pointer items-center">
+      <div className="px-5 py-4 hover:bg-[#1f2020] transition-colors cursor-pointer md:grid md:grid-cols-[2fr_1fr_1fr_1fr] md:gap-4 md:items-center">
         <div className="flex items-center gap-3 min-w-0">
           <div className="h-8 w-8 rounded-md bg-[#2f3f92]/20 flex items-center justify-center shrink-0">
             <BarChart3 className="h-4 w-4 text-[#bac3ff]" />
@@ -15,20 +15,30 @@ export function PortfolioCard({ portfolio }: { portfolio: Portfolio }) {
           <span className="text-sm text-[#e7e5e5] font-medium truncate">
             {portfolio.name}
           </span>
+          <span className="md:hidden inline-flex items-center px-2 py-0.5 rounded-sm text-xs font-medium bg-[#4ade80]/10 text-[#4ade80] ml-auto shrink-0">
+            Active
+          </span>
         </div>
-        <div className="text-right">
+        <div className="flex items-center justify-between mt-2 md:mt-0 md:block md:text-right pl-11 md:pl-0">
           <span className="text-sm font-mono text-[#e7e5e5]">
             {portfolio.total_value_inr
               ? formatINR(portfolio.total_value_inr)
               : "—"}
           </span>
+          <span className="text-xs text-[#9f9da1] md:hidden">
+            {new Date(portfolio.updated_at).toLocaleDateString("en-IN", {
+              day: "numeric",
+              month: "short",
+              year: "numeric",
+            })}
+          </span>
         </div>
-        <div className="text-center">
+        <div className="hidden md:block text-center">
           <span className="inline-flex items-center px-2 py-0.5 rounded-sm text-xs font-medium bg-[#4ade80]/10 text-[#4ade80]">
             Active
           </span>
         </div>
-        <div className="text-right">
+        <div className="hidden md:block text-right">
           <span className="text-xs text-[#9f9da1]">
             {new Date(portfolio.updated_at).toLocaleDateString("en-IN", {
               day: "numeric",

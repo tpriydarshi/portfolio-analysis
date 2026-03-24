@@ -44,8 +44,8 @@ export function ExposurePieChart({ stocks }: ExposurePieChartProps) {
       <h3 className="text-xs text-[#9f9da1] uppercase tracking-wider font-medium mb-4">
         Top Holdings
       </h3>
-      <div className="flex items-center gap-6">
-        <div className="h-[240px] w-[240px] shrink-0">
+      <div className="flex flex-col md:flex-row items-center gap-6">
+        <div className="h-[180px] w-[180px] md:h-[240px] md:w-[240px] shrink-0">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie

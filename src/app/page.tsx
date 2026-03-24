@@ -50,13 +50,13 @@ export default function LandingPage() {
 
           <h1 className="font-heading text-5xl md:text-6xl lg:text-7xl font-semibold text-[#e7e5e5] tracking-tight leading-[1.1] mb-6">
             Unmasking your
-            <br />
-            mutual fund
-            <br />
-            portfolio&apos;s{" "}
+            <br className="hidden lg:block" />
+            {" "}mutual fund
+            <br className="hidden lg:block" />
+            {" "}portfolio&apos;s{" "}
             <em className="text-[#4ade80]">true stock
-            <br />
-            exposure.</em>
+            <br className="hidden lg:block" />
+            {" "}exposure.</em>
           </h1>
 
           <p className="text-lg text-[#acabaa] max-w-2xl mb-8 leading-relaxed">
